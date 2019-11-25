@@ -23,7 +23,15 @@ public class Task6 implements Task {
   private Set<String> getPersonDescriptions(Collection<Person> persons,
                                             Map<Integer, Set<Integer>> personAreaIds,
                                             Collection<Area> areas) {
-    return new HashSet<>();
+    Set<String> set = new HashSet<>();
+    for (Person p : persons) {
+      for (Integer id : personAreaIds.get(p.getId())) {
+        for (Area a : areas) {
+
+        }
+      }
+    }
+    return set;
   }
 
   @Override
