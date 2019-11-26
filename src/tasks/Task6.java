@@ -25,9 +25,13 @@ public class Task6 implements Task {
                                             Collection<Area> areas) {
     Set<String> set = new HashSet<>();
     for (Person p : persons) {
+      String name = p.getFirstName();
       for (Integer id : personAreaIds.get(p.getId())) {
         for (Area a : areas) {
-
+          if (id == a.getId()) {
+            set.add(name + " - " + a.getName());
+            break;
+          }
         }
       }
     }
