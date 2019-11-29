@@ -5,6 +5,7 @@ import common.Task;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
 А теперь о горьком
@@ -21,9 +22,11 @@ public class Task8 implements Task {
 
   //Не хотим выдывать апи нашу фальшивую персону, поэтому конвертим начиная со второй
   public List<String> getNames(List<Person> persons) {
+    /*
     if (persons.size() == 0) {
-      return Collections.emptyList();
+      return Collections.emptyList(); >>> удаляем, стрим создаст пустую коллекцию
     }
+    */
     /*
     persons.remove(0); >>> удаляем эту строку, так как список persons может быть не изменяемым, следовательно при
     попытке удалить эелемент получим UnsupportedOperationException.
@@ -48,11 +51,13 @@ public class Task8 implements Task {
 
   //Для фронтов выдадим полное имя, а то сами не могут
   public String convertPersonToString(Person person) {
-    String result = "";
+    /*
+    String result = ""; >>> удаляем переменную
     if (person.getSecondName() != null) {
       result += person.getSecondName();
     }
-
+    заменяем условия на стрим
+    */
     /*
     if (person.getFirstName() != null) {
       result += " " + person.getFirstName(); >>> заменяем строку с использованием тернарного оператора
@@ -60,20 +65,15 @@ public class Task8 implements Task {
     Объект person может быть создан с помощью контруктора "public Person(Integer id, String firstName, Instant createdAt)",
     в таком случае перед именем будет стоять лишний пробел.
     */
-    if (person.getFirstName() != null) {
-      result += person.getSecondName() == null ? person.getFirstName() : " " + person.getFirstName();
-    }
-
     /*
     if (person.getSecondName() != null) {
       result += " " + person.getSecondName();
     }
     заменяем secondName на MiddleName
     */
-    if (person.getMiddleName() != null) {
-      result += " " + person.getMiddleName();
-    }
-    return result;
+    return Stream.of(person.getSecondName(), person.getFirstName(), person.getMiddleName())
+            .map(p -> p == null ? "" : p)
+            .collect(Collectors.joining(" ")).trim();
   }
 
   // словарь id персоны -> ее имя
@@ -87,11 +87,8 @@ public class Task8 implements Task {
       }
     }
     */
-    Map<Integer, String> map = new HashMap<>(persons.size());
-    for (Person person : persons) {
-        map.put(person.getId(), convertPersonToString(person));
-    }
-    return map;
+    return persons.stream()
+            .collect(Collectors.toMap(Person::getId, this::convertPersonToString));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
@@ -101,19 +98,15 @@ public class Task8 implements Task {
     for (Person person1 : persons1) {
       for (Person person2 : persons2) {
         if (person1.equals(person2)) {
-          has = true; >>> можем сразу вернуть true, чтобы не продолжать перебирать коллекции
+          has = true;
         }
       }
     }
+    Создаем HashSet из первой коллекции, теперь временная сложность обращения к элементу O(1).
+    Теперь перебираем вторую коллекцию и смотрим есть ли совпадения с первой, в итоге сложность O(n).
     */
-    for (Person person1 : persons1) {
-      for (Person person2 : persons2) {
-        if (person1.equals(person2)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    Set<Person> persons = new HashSet<>(persons1);
+    return persons2.stream().anyMatch(persons::contains);
   }
 
   //Выглядит вроде неплохо...
