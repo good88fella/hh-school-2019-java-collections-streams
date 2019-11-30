@@ -22,10 +22,10 @@ public class Task1 implements Task {
   */
   private List<Person> findOrderedPersons(List<Integer> personIds) {
     Set<Person> persons = PersonService.findPersons(personIds);
-    Map<Integer, Person> tmpMap = persons.stream()
+    Map<Integer, Person> personsMap = persons.stream()
             .collect(Collectors.toMap(Person::getId, p -> p));
     return personIds.stream()
-            .map(tmpMap::get)
+            .map(personsMap::get)
             .collect(Collectors.toList());
   }
 

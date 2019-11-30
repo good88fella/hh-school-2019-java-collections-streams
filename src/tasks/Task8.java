@@ -18,7 +18,7 @@ P.P.S Здесь ваши правки желательно прокоммент
  */
 public class Task8 implements Task {
 
-  // private long count; >>> удаляем строку, так как хранить значение в этом поле нет смысла
+  private long count; //>>> удаляем строку, так как хранить значение в этом поле нет смысла
 
   //Не хотим выдывать апи нашу фальшивую персону, поэтому конвертим начиная со второй
   public List<String> getNames(List<Person> persons) {
@@ -72,23 +72,23 @@ public class Task8 implements Task {
     заменяем secondName на MiddleName
     */
     return Stream.of(person.getSecondName(), person.getFirstName(), person.getMiddleName())
-            .map(p -> p == null ? "" : p)
-            .collect(Collectors.joining(" ")).trim();
+            .filter(p -> p != null)
+            .collect(Collectors.joining(" "));
   }
 
   // словарь id персоны -> ее имя
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
     /*
-    Map<Integer, String> map = new HashMap<>(1); >>> можем создать словарь сразу нужного размера
+    Map<Integer, String> map = new HashMap<>(1);
     for (Person person : persons) {
-      if (!map.containsKey(person.getId())) { >>> условие ненужно, если попадуться объекты Person с одинаковым id
-                                                  элемент словаря перезапишется
+      if (!map.containsKey(person.getId())) {
         map.put(person.getId(), convertPersonToString(person));
       }
     }
     */
     return persons.stream()
-            .collect(Collectors.toMap(Person::getId, this::convertPersonToString));
+            .collect(Collectors.toMap(Person::getId, p -> convertPersonToString(p),
+                    (existing, replacement) -> existing));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
@@ -110,12 +110,15 @@ public class Task8 implements Task {
   }
 
   //Выглядит вроде неплохо...
+
   /*
   public long countEven(Stream<Integer> numbers) { >>> заменяем стрим на коллекцию
-    count = 0; >>> удаляем строку, переменная не нужна
+    count = 0; //>>> удаляем строку, переменная не нужна
     numbers.filter(num -> num % 2 == 0).forEach(num -> count++); >>> заменяем forEach на метод count
     return count;
   }
+  В случае многопоточности результат может быть неверным, так как другой поток может влезть и обнулить,
+  изменить переменную count, которая в данный момент используется еще каким-то потоком.
   */
   public long countEven(Collection<Integer> numbers) {
     return numbers.stream()
