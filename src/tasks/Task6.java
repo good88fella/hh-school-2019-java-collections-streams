@@ -24,10 +24,12 @@ public class Task6 implements Task {
     Map<Integer, String> areasMap = areas.stream().
             collect(Collectors.toMap(Area::getId, Area::getName));
     for(Person p : persons) {
-      personAreaIds.get(p.getId()).stream()
-              .map(areasMap::get)
-              .map(area -> String.join(" - ", p.getFirstName(), area))
-              .forEach(personNamesAndAreas::add);
+      if (personAreaIds.get(p.getId()) != null) {
+        personAreaIds.get(p.getId()).stream()
+                .map(areasMap::get)
+                .map(area -> String.join(" - ", p.getFirstName(), area))
+                .forEach(personNamesAndAreas::add);
+      }
     }
     return personNamesAndAreas;
   }
